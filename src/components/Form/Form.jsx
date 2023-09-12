@@ -1,58 +1,55 @@
-import { nanoid } from 'nanoid';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getContacts } from 'redux/selectors';
-import { addContact } from 'redux/contactsSlice';
-import { toast } from 'react-toastify';
+import { addContact } from 'redux/operations';
+import { selectContacts } from 'redux/selectors';
 
 export const Form = () => {
+  const [contact, setContact] = useState({ name: '', number: '' });
+  const contacts = useSelector(selectContacts);
   const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
 
-  const handleSubmit = event => {
-    event.preventDefault();
-
-    const contact = {
-      name: event.currentTarget.elements.name.value,
-      number: event.currentTarget.elements.number.value,
-      id: nanoid(),
-    };
+  const handleSubmit = evt => {
+    evt.preventDefault();
     const isExist = contacts.find(
-      ({ name }) => name.toLowerCase() === contact.name.toLowerCase()
+      elem => elem.name.toLowerCase() === contact.name.toLowerCase()
     );
-
-    if (isExist) {
-      return toast.warn(`${contact.name} is already in contacts.`);
-    }
-
+    if (isExist) return alert(`${contact.name} is already in contacts`);
     dispatch(addContact(contact));
-    event.currentTarget.reset();
+    setContact({ name: '', number: '' });
+  };
+
+  const handleOnChange = event => {
+    const { name, value } = event.target;
+    setContact({ ...contact, [name]: value });
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor={nanoid()}>
+      <label>
         Name
         <input
+          value={contact.name}
+          onChange={handleOnChange}
           type="text"
           name="name"
           pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-          id={nanoid()}
           required
         />
       </label>
-      <label htmlFor={nanoid()}>
+      <label>
         Number
         <input
+          value={contact.number}
+          onChange={handleOnChange}
           type="tel"
           name="number"
           pattern="\+?\d{1,4}?[ .\-\s]?\(?\d{1,3}?\)?[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-          id={nanoid()}
           required
         />
       </label>
-      <button type="submit">Add contacts</button>
+      <button type="submit">Add contact</button>
     </form>
   );
 };

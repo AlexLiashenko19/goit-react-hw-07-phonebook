@@ -1,19 +1,16 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setFilter } from 'redux/filterSlice';
-import { getFilter } from 'redux/selectors';
+import { useDispatch } from 'react-redux';
+import { changeFilter } from 'redux/filter/filterSlice';
 
 export const Filter = () => {
   const dispatch = useDispatch();
-  const filter = useSelector(getFilter);
+
+  const handleChange = e => {
+    dispatch(changeFilter(e.target.value));
+  };
   return (
     <>
       <h3>Find contacts by name</h3>
-      <input
-        type="text"
-        value={filter}
-        onChange={event => dispatch(setFilter(event.target.value.trim()))}
-      />
+      <input type="text" name="filter" onChange={handleChange} />
     </>
   );
 };
